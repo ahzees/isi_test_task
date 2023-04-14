@@ -1,21 +1,13 @@
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from django.db import models
-
-
-def validate_participants(elem):
-    if elem.count() > 2:
-        raise ValidationError("Thread can't have more than 2 participants.")
 
 
 # Create your models here.
 class Thread(models.Model):
-    participants = models.ForeignKey(
+    participants = models.ManyToManyField(
         User,
         related_name="threads",
-        validators=[validate_participants],
         verbose_name="participants",
-        on_delete=models.DO_NOTHING,
     )
     created = models.DateTimeField("Created at", auto_now_add=True)
     updated = models.DateTimeField("Updated at", auto_now=True)
@@ -25,10 +17,9 @@ class Thread(models.Model):
 
 
 class Message(models.Model):
-    sender = models.ForeignKey(
+    sender = models.ManyToManyField(
         User,
         related_name="messages",
-        on_delete=models.DO_NOTHING,
         verbose_name="Sender",
     )
     text = models.TextField("Text")

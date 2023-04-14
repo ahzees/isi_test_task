@@ -1,5 +1,9 @@
 from django.shortcuts import render
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import (
+    ListAPIView,
+    RetrieveAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
 
 from .models import *
 from .serializers import ThreadSerializer
@@ -10,3 +14,11 @@ from .serializers import ThreadSerializer
 class ThreadApiView(ListAPIView):
     serializer_class = ThreadSerializer
     queryset = Thread.objects.all()
+
+
+class TheThreadApiView(RetrieveUpdateDestroyAPIView):
+    serializer_class = ThreadSerializer
+    queryset = Thread.objects.all()
+
+
+# class
