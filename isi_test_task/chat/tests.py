@@ -104,15 +104,15 @@ class MessageApiViewTestCase(JWTApiViewTestCase):
 
     def test_list_messages(self):
         # Превірка чи тред містить всі повідомлення
-        url = reverse("messages", args=[self.thread.pk])
+        url = reverse("threads-messages", args=[self.thread.pk])
         response = self.client.get(url, **self.auth(self.user1))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
     def test_create_message(self):
-        # Перевірка створення треду
-        url = reverse("messages", args=[self.thread.pk])
-        data = {"text": "New message"}
+        # Перевірка створення повідомлення для треду
+        url = reverse("threads-messages", args=[self.thread.pk])
+        data = {"text": "New message", "sender": self.user1.pk}
         response = self.client.post(url, data, format="json", **self.auth(self.user1))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["sender"], self.user1.pk)
@@ -120,7 +120,7 @@ class MessageApiViewTestCase(JWTApiViewTestCase):
 
     def test_create_message_without_auth(self):
         # Перевірка створення повідомлення, якщо користувача не авторизовано
-        url = reverse("messages", args=[self.thread.pk])
+        url = reverse("threads-messages", args=[self.thread.pk])
         data = {"text": "New message"}
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
