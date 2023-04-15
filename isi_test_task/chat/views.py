@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.db.models import Case, Count, When
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.generics import (
@@ -108,10 +109,11 @@ class NewUserMessagesApiView(APIView):
     ]
 
     def get(self, request, pk):
-        user = get_object_or_404(User, pk=pk)
+        obj = get_object_or_404(User, pk=pk)
         count = (
-            Message.objects.filter(thread__participants=user)
-            .exclude(sender=user)
+            Message.objects.filter(is_read=False)
+            .filter(thread__participants=obj)
+            .exclude(sender=obj)
             .count()
         )
         return Response({"amount of new messages": count})

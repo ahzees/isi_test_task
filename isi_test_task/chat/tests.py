@@ -21,8 +21,16 @@ def create_message(sender, thread, text):
     return Message.objects.create(sender=sender, thread=thread, text=text)
 
 
+class JWTApiViewTestCase(APITestCase):
+    def auth(self, user):
+        data = {"username": user.username, "password": "testpass"}
+        url = reverse("token_obtain_pair")
+        response = self.client.post(url, data)
+        return {"HTTP_AUTHORIZATION": f"Bearer {response.data['access']}"}
+
+
 # Тести для перегляду треду та створення треду
-class ThreadApiViewTestCase(APITestCase):
+class ThreadApiViewTestCase(JWTApiViewTestCase):
     def setUp(self):
         self.client = APIClient()
         self.user1 = create_user("testuser1", "testuser1@gmail.com", "testpass")
@@ -31,25 +39,25 @@ class ThreadApiViewTestCase(APITestCase):
     def test_create_thread(self):
         url = reverse("threads")
         data = {"user1_id": self.user1.pk, "user2_id": self.user2.pk}
-        response = self.client.post(url, data, format="json")
+        response = self.client.post(url, data, format="json", **self.auth(self.user1))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_create_existing_thread(self):
         thread = create_thread(self.user1, self.user2)
         url = reverse("threads")
         data = {"user1_id": self.user1.pk, "user2_id": self.user2.pk}
-        response = self.client.post(url, data, format="json")
+        response = self.client.post(url, data, format="json", **self.auth(self.user1))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_create_thread_with_same_user(self):
         url = reverse("threads")
         data = {"user1_id": self.user1.pk, "user2_id": self.user1.pk}
-        response = self.client.post(url, data, format="json")
+        response = self.client.post(url, data, format="json", **self.auth(self.user1))
         self.assertEqual(len(response.data["participants"]), 1)
 
 
 # Тести для видалення треду
-class DeleteThreadApiViewTestCase(APITestCase):
+class DeleteThreadApiViewTestCase(JWTApiViewTestCase):
     def setUp(self):
         self.client = APIClient()
         self.user1 = create_user("testuser1", "testuser1@gmail.com", "testpass")
@@ -58,12 +66,12 @@ class DeleteThreadApiViewTestCase(APITestCase):
 
     def test_delete_thread(self):
         url = reverse("threads-delete", args=[self.thread.pk])
-        response = self.client.delete(url)
+        response = self.client.delete(url, **self.auth(self.user1))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
 # Тести для списку тредів користувача
-class UserThreadsApiViewTestCase(APITestCase):
+class UserThreadsApiViewTestCase(JWTApiViewTestCase):
     def setUp(self):
         self.client = APIClient()
         self.user1 = create_user("testuser1", "testuser1@gmail.com", "testpass")
@@ -74,5 +82,5 @@ class UserThreadsApiViewTestCase(APITestCase):
 
     def test_user_threads(self):
         url = reverse("user-threads", args=[self.user1.pk])
-        response = self.client.get(url)
+        response = self.client.get(url, **self.auth(self.user1))
         self.assertEqual(len(response.data["threads"]), 2)

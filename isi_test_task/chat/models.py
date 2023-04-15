@@ -12,8 +12,11 @@ class Thread(models.Model):
     created = models.DateTimeField("Created at", auto_now_add=True)
     updated = models.DateTimeField("Updated at", auto_now=True)
 
+    class Meta:
+        verbose_name_plural = "Threads"
+
     def __str__(self) -> str:
-        return f"{self.pk}"
+        return f"Thread ID: {self.pk}"
 
 
 class Message(models.Model):
@@ -28,8 +31,11 @@ class Message(models.Model):
     thread = models.ForeignKey(
         Thread, related_name="messages", on_delete=models.DO_NOTHING
     )
-    created = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
+    created = models.DateTimeField("Created at", auto_now_add=True)
+    is_read = models.BooleanField("Is read", default=False)
+
+    class Meta:
+        verbose_name_plural = "Messages"
 
     def __str__(self) -> str:
         return f"{self.pk}"

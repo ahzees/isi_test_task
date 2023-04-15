@@ -1,5 +1,7 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.db.models import Case, Count, When
 
 from .models import Message, Thread
 
@@ -40,3 +42,33 @@ class MessageAdmin(admin.ModelAdmin):
         "pk",
     )
     search_fields = ("sender__username", "thread__pk", "pk", "text")
+
+
+admin.site.unregister(User)
+
+
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    list_display = ("username", "pk", "is_staff", "is_superuser", "last_login")
+    list_display_links = (
+        "username",
+        "pk",
+    )
+    search_fields = ("pk", "username")
+    readonly_fields = ("last_login", "list_threads", "new_messages")
+    fieldsets = (
+        (None, {"fields": ("username",)}),
+        ("Personal information", {"fields": ("last_login", "list_threads")}),
+        ("New Messages", {"fields": ("new_messages",)}),
+    )
+
+    def list_threads(self, obj):
+        return [str(i) for i in obj.threads.all()]
+
+    def new_messages(self, obj):
+        return (
+            Message.objects.filter(is_read=False)
+            .filter(thread__participants=obj)
+            .exclude(sender=obj)
+            .count()
+        )
