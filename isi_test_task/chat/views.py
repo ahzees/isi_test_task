@@ -81,10 +81,12 @@ class ThreadMessagesApiView(ListCreateAPIView):
         IsAuthenticated,
     ]
 
+    # вибір всіх повідомлень для конкретного треду
     def get_queryset(self):
         pk = self.kwargs["pk"]
         return Thread.objects.get(pk=pk).messages.all()
 
+    # створення повідомлення для конкретного треду
     def post(self, request, *args, **kwargs):
         data = request.data
         thread = Thread.objects.get(pk=self.kwargs["pk"])
@@ -108,6 +110,7 @@ class NewUserMessagesApiView(APIView):
         IsAuthenticated,
     ]
 
+    # вибірка всіх повідомлень для конкретного юзера
     def get(self, request, pk):
         obj = get_object_or_404(User, pk=pk)
         count = (
