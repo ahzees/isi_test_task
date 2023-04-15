@@ -17,10 +17,12 @@ class Thread(models.Model):
 
 
 class Message(models.Model):
-    sender = models.ManyToManyField(
+    sender = models.ForeignKey(
         User,
+        on_delete=models.DO_NOTHING,
         related_name="messages",
-        verbose_name="Sender",
+        verbose_name="sender",
+        null=True,
     )
     text = models.TextField("Text")
     thread = models.ForeignKey(

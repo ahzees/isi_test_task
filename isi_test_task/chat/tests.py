@@ -16,8 +16,6 @@ class ThreadTestCase(TestCase):
         # Створюємо новий тред з двома учасниками
         thread = Thread.objects.create()
         thread.participants.add(self.user1, self.user2)
-        thread.save()
         # Спробуємо додати ще одного учасника до треду, має викликати помилку валідації
         with self.assertRaises(ValidationError):
             thread.participants.add(self.user3)
-            thread.save()
