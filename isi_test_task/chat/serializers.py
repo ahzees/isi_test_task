@@ -5,6 +5,8 @@ from .models import *
 
 
 class ThreadSerializer(serializers.ModelSerializer):
+    # серіалізатор для списка тредів
+
     participants = serializers.SerializerMethodField()
 
     class Meta:
@@ -21,6 +23,8 @@ class ThreadSerializer(serializers.ModelSerializer):
 
 
 class TheThreadSerializer(ThreadSerializer):
+    # серіалізатор для конкретного треду
+
     messages_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -32,6 +36,8 @@ class TheThreadSerializer(ThreadSerializer):
 
 
 class UserThreadSerializer(serializers.ModelSerializer):
+    # серіалізатор для всіх тредів користувача
+
     threads = serializers.SerializerMethodField()
 
     class Meta:
@@ -46,6 +52,8 @@ class UserThreadSerializer(serializers.ModelSerializer):
 
 
 class MessagesSerializer(serializers.ModelSerializer):
+    # серіалізатор для створення повідомлення в треді
+
     class Meta:
         model = Message
         fields = [
@@ -56,6 +64,8 @@ class MessagesSerializer(serializers.ModelSerializer):
 
 
 class ThreadMessagesSerializer(serializers.ModelSerializer):
+    # серіалізатор для всіх повідомлень у треді
+
     class Meta:
         model = Message
         fields = [
@@ -68,6 +78,8 @@ class ThreadMessagesSerializer(serializers.ModelSerializer):
 
 
 class ViewMessagesSerializer(serializers.ModelSerializer):
+    # серіалізатор для перегляду повідомлень
+
     class Meta:
         model = Message
         fields = ["sender", "thread", "text", "is_read"]
