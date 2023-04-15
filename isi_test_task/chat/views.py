@@ -55,6 +55,12 @@ class DeleteThreadApiView(DestroyAPIView):
     queryset = Thread.objects.all()
 
 
+# Список тредів для конкретного користувача
+class UserThreadsApiView(RetrieveAPIView):
+    serializer_class = UserThreadSerializer
+    queryset = User.objects.all()
+
+
 # Список повідомлень для конкретного треду та створення нових
 class ThreadMessagesApiView(ListCreateAPIView):
     serializer_class = ThreadMessagesSerializer
