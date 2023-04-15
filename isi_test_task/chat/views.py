@@ -89,3 +89,23 @@ class ThreadMessagesApiView(ListCreateAPIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+# Перегляд нових повідомлень для конкретного юзера
+class NewUserMessagesApiView(APIView):
+    serializer_class = UserThreadSerializer
+
+    def get(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        count = (
+            Message.objects.filter(thread__participants=user)
+            .exclude(sender=user)
+            .count()
+        )
+        return Response({"amount of new messages": count})
+
+
+# Cтворення повідомлення
+class ReadMessageApiView(RetrieveUpdateAPIView):
+    serializer_class = ViewMessagesSerializer
+    queryset = Message.objects.all()

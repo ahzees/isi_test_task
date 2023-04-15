@@ -15,4 +15,10 @@ urlpatterns = [
     path(
         "api/users/<int:pk>/threads/", views.UserThreadsApiView.as_view()
     ),  # Перегляд всіх тредів конкретного користувача
+    path(
+        "api/users/<int:pk>/new_messages/", views.NewUserMessagesApiView.as_view()
+    ),  # Перегляд всіх непрочитаних повідомлень для конкретного юзера
+    path(
+        "api/messages/<int:pk>/", views.ReadMessageApiView.as_view()
+    ),  # Прочитати повідомлення
 ]
