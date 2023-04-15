@@ -47,3 +47,9 @@ class ThreadApiView(ListCreateAPIView):
 
         serializer = ThreadSerializer(thread)
         return Response(serializer.data)
+
+
+# Видалення треду
+class DeleteThreadApiView(DestroyAPIView):
+    serializer_class = TheThreadSerializer
+    queryset = Thread.objects.all()
