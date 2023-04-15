@@ -53,3 +53,33 @@ class ThreadApiView(ListCreateAPIView):
 class DeleteThreadApiView(DestroyAPIView):
     serializer_class = TheThreadSerializer
     queryset = Thread.objects.all()
+
+
+# Список повідомлень для конкретного треду та створення нових
+class ThreadMessagesApiView(ListCreateAPIView):
+    serializer_class = ThreadMessagesSerializer
+
+    def get_queryset(self):
+        pk = self.kwargs["pk"]
+        return Thread.objects.get(pk=pk).messages.all()
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        if data["sender"] not in (
+            thread := [
+                i[0]
+                for i in (
+                    Thread.objects.get(pk=self.kwargs["pk"])
+                ).participants.values_list("pk")
+            ]
+        ):
+            return Response(
+                ThreadMessagesSerializer(thread.messages.all(), many=True).data,
+                status=status.HTTP_406_NOT_ACCEPTABLE,
+            )
+        data["thread"] = self.kwargs["pk"]
+        serializer = MessagesSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
