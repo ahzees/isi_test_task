@@ -7,6 +7,8 @@ from rest_framework.generics import (
     RetrieveAPIView,
     RetrieveUpdateAPIView,
 )
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -25,6 +27,9 @@ from .serializers import (
 class ThreadApiView(ListCreateAPIView):
     serializer_class = ThreadSerializer
     queryset = Thread.objects.all()
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def post(self, request):
         user1_id = get_object_or_404(User, pk=request.data.get("user1_id"))
@@ -38,32 +43,42 @@ class ThreadApiView(ListCreateAPIView):
             .first()
         ):
             serializer = ThreadSerializer(thread)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         # Якщо тред не існує, створюємо новий
         thread = Thread.objects.create()
         thread.participants.add(user1_id, user2_id)
-        thread.save()
 
         serializer = ThreadSerializer(thread)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 # Видалення треду
 class DeleteThreadApiView(DestroyAPIView):
     serializer_class = TheThreadSerializer
     queryset = Thread.objects.all()
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
 
 # Список тредів для конкретного користувача
 class UserThreadsApiView(RetrieveAPIView):
     serializer_class = UserThreadSerializer
     queryset = User.objects.all()
+    pagination_class = LimitOffsetPagination
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
 
 # Список повідомлень для конкретного треду та створення нових
 class ThreadMessagesApiView(ListCreateAPIView):
     serializer_class = ThreadMessagesSerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def get_queryset(self):
         pk = self.kwargs["pk"]
@@ -71,19 +86,13 @@ class ThreadMessagesApiView(ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        if data["sender"] not in (
-            thread := [
-                i[0]
-                for i in (
-                    Thread.objects.get(pk=self.kwargs["pk"])
-                ).participants.values_list("pk")
-            ]
-        ):
+        thread = Thread.objects.get(pk=self.kwargs["pk"])
+        if data["sender"] not in [i[0] for i in thread.participants.values_list("pk")]:
             return Response(
                 ThreadMessagesSerializer(thread.messages.all(), many=True).data,
                 status=status.HTTP_406_NOT_ACCEPTABLE,
             )
-        data["thread"] = self.kwargs["pk"]
+        data["thread"] = thread.pk
         serializer = MessagesSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -94,6 +103,9 @@ class ThreadMessagesApiView(ListCreateAPIView):
 # Перегляд нових повідомлень для конкретного юзера
 class NewUserMessagesApiView(APIView):
     serializer_class = UserThreadSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def get(self, request, pk):
         user = get_object_or_404(User, pk=pk)
@@ -105,7 +117,10 @@ class NewUserMessagesApiView(APIView):
         return Response({"amount of new messages": count})
 
 
-# Cтворення повідомлення
+# Відмітити повідомлення як прочитане
 class ReadMessageApiView(RetrieveUpdateAPIView):
     serializer_class = ViewMessagesSerializer
     queryset = Message.objects.all()
+    permission_classes = [
+        IsAuthenticated,
+    ]
