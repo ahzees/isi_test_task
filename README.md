@@ -36,7 +36,7 @@ poetry shell
 cd isi_test_task/
 ```
 <br></br>
-### Run migrations
+### Run migrations. You must have an .env file in the root of your Django project
 <br></br>
 ```{r test-python, engine='python'}
 python manage.py makemigrations chat
