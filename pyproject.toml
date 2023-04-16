@@ -8,12 +8,12 @@ packages = [{include = "isi_test_task"}]
 
 [tool.poetry.dependencies]
 python = "^3.8.10"
+
+[tool.poetry.group.dev.dependencies]
 djangorestframework-simplejwt = "^5.2.2"
 django-dotenv = "^1.4.2"
 django = "^4.2"
 djangorestframework = "^3.14.0"
-
-[tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
 mypy = "^1.2.0"
 isort = "^5.12.0"
