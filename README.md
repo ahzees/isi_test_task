@@ -36,6 +36,13 @@ poetry shell
 cd isi_test_task/
 ```
 <br></br>
+### Run migrations
+<br></br>
+```{r test-python, engine='python'}
+python manage.py makemigrations chat
+python manage.py migrate
+```
+<br></br>
 ### Load dump.json
 <br></br>
 ```{r test-python, engine='python'}
