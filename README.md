@@ -55,3 +55,9 @@ python manage.py loaddata dump.json
 python manage.py runserver
 ```
 <br></br>
+### To view api documentation
+<br></br>
+```{r test-python, engine='python'}
+http://127.0.0.1:8000/api/schema/swagger-ui/#/
+```
+<br></br>
