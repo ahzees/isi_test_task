@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db.models import Case, Count, When
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import (
     DestroyAPIView,
@@ -15,6 +16,7 @@ from rest_framework.views import APIView
 
 from .models import *
 from .serializers import (
+    CreateThreadSerializer,
     MessagesSerializer,
     TheThreadSerializer,
     ThreadMessagesSerializer,
@@ -32,6 +34,7 @@ class ThreadApiView(ListCreateAPIView):
         IsAuthenticated,
     ]
 
+    @extend_schema(request=CreateThreadSerializer)
     def post(self, request):
         user1_id = get_object_or_404(User, pk=request.data.get("user1_id"))
         user2_id = get_object_or_404(User, pk=request.data.get("user2_id"))
@@ -109,8 +112,10 @@ class NewUserMessagesApiView(APIView):
     permission_classes = [
         IsAuthenticated,
     ]
-
-    # вибірка всіх повідомлень для конкретного юзера
+    # вибірка всіх повідомлень для конкретного юзер
+    @extend_schema(
+        responses={200: {"amount of new messages": 12}},
+    )
     def get(self, request, pk):
         obj = get_object_or_404(User, pk=pk)
         count = (

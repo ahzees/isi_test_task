@@ -4,6 +4,14 @@ from rest_framework import serializers
 from .models import *
 
 
+class CreateThreadSerializer(serializers.ModelSerializer):
+    # серіалізатор для cтворення тредів
+
+    class Meta:
+        model = Thread
+        fields = ["pk", "participants"]
+
+
 class ThreadSerializer(serializers.ModelSerializer):
     # серіалізатор для списка тредів
 
