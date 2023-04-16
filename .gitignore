@@ -6,3 +6,4 @@ db.sqlite3
 /*/**/migrations
 .mypy_cache
 /*/**/dev_settings.py
+poetry.lock
